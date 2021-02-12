@@ -57,7 +57,7 @@ for year in range(2016,2021):
                            '16:00', '17:00', '18:00', '19:00',
                            '20:00', '21:00', '22:00', '23:00',
                            ],
-                       "format": "nc",
+                       "format": "netcdf",
                        'area': [
                            15.,75.,60.,135.]   #Lat1 Lon1 Lat2 Lon2, a tiny area
                        }, filename)
