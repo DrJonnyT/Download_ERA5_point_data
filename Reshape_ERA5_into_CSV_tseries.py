@@ -16,11 +16,11 @@ site_data=pd.read_csv(url)
 #site_data=pd.read_csv('Sites_modifed2.csv')
 
 site_data = site_data.set_index('Site_Number')
-site_data.head()
 
 
-
+###############################################################################
 #Loop through the different sites
+#Making one met file for each site
 for index, row in site_data.iterrows():
     lat = row['Latitude']
     lon = row['Longitude']
@@ -28,7 +28,7 @@ for index, row in site_data.iterrows():
 
     data_thissite = []
     #Loop through all the met files
-    for filepath in glob.iglob(r'C:\Users\mbcx5jt5\Google Drive\China_met\met\*.nc'):
+    for filepath in glob.iglob(r'C:\Work\Python\Github\Download_ERA5_point_data\met*.nc'):
         try:
             ds = xr.open_dataset(filepath)
             df_thisfile_thissite =  ds.sel(longitude=lon,latitude=lat,method="nearest").to_dataframe().drop(['latitude','longitude'],axis=1)
@@ -39,56 +39,46 @@ for index, row in site_data.iterrows():
         except:
             print('Failed to load ' + filepath)
         
-        
+    #I think you need to have the directory /met_sites/ already created    
     export_filename = "met_sites/" + index + ".csv"
     pd.concat(data_thissite,axis=0).to_csv(export_filename)
         
 
-type(data_thissite)
-               )
-tes = [ds.data_vars.keys(]
-ds.sel(longitude=lon,latitude=lat,method="nearest").values()
 
 
-#Nanjing_met_test = ds.to_dataframe()
-#Nanjing_met_test.head()
-ds.sel(obs=0)
-Nanjing_met_site1 = (ds.sel(obs=0)).to_dataframe()
-Nanjing_met_site2 = (ds.sel(obs=1)).to_dataframe()
+###############################################################################
+#Loop through the different variable
+#Create one file with all the pressure, one for all the temperature etc etc, with the columns being the different sites
 
-##Need to then make a new dataframe with the met data and time
-#First convert the time. The timestamp is in nanoseconds since 1st jan 1979, obviously
-datetimes = pd.to_datetime(Nanjing_met_site1.index, unit='ns')
+#First, what are the data variables?
+variable_names = list(xr.open_dataset(r'C:\Work\Python\Github\Download_ERA5_point_data\met\2016-1-China_ERA5_met.nc').keys())
+#data arrays of the latitude and longitude to use for indexing to extract only tyhe right data points
+lats = xr.DataArray(site_data['Latitude']) #'z' is an arbitrary name placeholder
+lons = xr.DataArray(site_data['Longitude'])
 
-Nanjing_met_site1['utc_time']=pd.to_datetime(Nanjing_met_site1.index, unit='ns')
-Nanjing_met_site1 = Nanjing_met_site1.set_index('utc_time')
-Nanjing_met_site1 = Nanjing_met_site1.drop('realization', 1)
-Nanjing_met_site1
-    
-
-
-
-
-ds = xr.open_dataset(filepath)
-
-#ds.get_index('longitude')
-#ds.get_index('latitude')
-
-
-
-test = ds.t2m.sel(longitude=75.1,latitude=60.1,method="nearest").values
-test = ds.sel(longitude=75.1,latitude=60.1,method="nearest").values
-test
-
-ds.get_index('time')
-
-
-#Make new dataframe with the index of the time
-df_t2m_thisfile = pd.DataFrame(ds.get_index('time'))
-
-#Make an array with the data in
-time_thisfile = ds.get_index('time')
-data_thissite = []
-
-
-
+#Now loop through the different variables
+for variable in variable_names:
+    first_iteration = 1    
+    #Loop through all the met files
+    for filepath in glob.iglob(r'C:\Work\Python\Github\Download_ERA5_point_data\met\*.nc'):
+        try:
+            ds = xr.open_dataset(filepath)
+            print('Loaded ' + filepath)
+            if(first_iteration):
+                data_df = pd.DataFrame(ds[variable].sel(latitude = lats, longitude = lons, method = 'nearest').values,columns=site_data.index).set_index(ds.time.values)
+                first_iteration=0
+            else:
+                #Not the most efficient way of doing it, sue me!
+                #Here there's some bullshit going on, the time is getting appended lots of times
+                data_df = data_df.append(pd.DataFrame(ds[variable].sel(latitude = lats, longitude = lons, method = 'nearest').values,columns=site_data.index).set_index(ds.time.values))
+                
+        except:
+            print('Failed to load ' + filepath)
+        
+    #Now you have time and data for one variable
+    #I think you need to have the directory /met_vars/ already created
+    export_filename = ('met_vars/' + variable + '.csv')
+    data_df.index.rename('time',inplace=True)
+    data_df = data_df.sort_values(by='time',ascending=True)
+    data_df.to_csv(export_filename)
+        
