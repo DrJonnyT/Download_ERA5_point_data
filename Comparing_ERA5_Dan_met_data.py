@@ -54,14 +54,16 @@ combined_df.plot.scatter('SLPress','msl')
 plt.xlabel('Dantong data')
 plt.ylabel('ERA5')
 plt.title('Sea level pressure(mbar)')
-plt.show()
+#plt.show()
+plt.savefig("figs/Pressure_scatter.png")
 
 #Temperature
 combined_df.plot.scatter('Temp_C','t2m')
 plt.xlabel('Dantong data')
 plt.ylabel('ERA5')
 plt.title('Temperature (C)')
-plt.show()
+#plt.show()
+plt.savefig("figs/Temp_scatter.png")
 
 #Wind
 from metpy.units import units
@@ -75,13 +77,15 @@ combined_df.plot.scatter('wind_u_10min','u10')
 plt.xlabel('Dantong data')
 plt.ylabel('ERA5')
 plt.title('Wind u (m/s)')
-plt.show()
+#plt.show()
+plt.savefig("figs/wind_u_scatter.png")
 
 combined_df.plot.scatter('wind_v_10min','v10')
 plt.xlabel('Dantong data')
 plt.ylabel('ERA5')
 plt.title('Wind v (m/s)')
-plt.show()
+#plt.show()
+plt.savefig("figs/wind_v_scatter.png")
 
 
 #RH
@@ -99,7 +103,8 @@ combined_df.plot.scatter('RH','RH_ERA5')
 plt.xlabel('Dantong data')
 plt.ylabel('ERA5')
 plt.title('RH (%)')
-plt.show()
+#plt.show()
+plt.savefig("figs/RH_scatter.png")
 
 
 #Tdew
@@ -107,7 +112,8 @@ combined_df.plot.scatter('Dan_Td','d2m')
 plt.xlabel('Dantong data')
 plt.ylabel('ERA5')
 plt.title('Dew point (C)')
-plt.show()
+#plt.show()
+plt.savefig("figs/Dew_point_scatter.png")
 
 
 
