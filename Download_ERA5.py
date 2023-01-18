@@ -18,26 +18,26 @@ c = cdsapi.Client()
 #This has 3 columns of Site_Number, Longitude, Latitude
 #Although in mine site number is actually a string
 
-url=r"https://www.dropbox.com/s/f2yvbhlld6hzj8m/Sites_modifed2.csv?dl=1"
-site_data=pd.read_csv(url)
-#site_data=pd.read_csv('Sites_modifed2.csv')
+#url=r"https://www.dropbox.com/s/f2yvbhlld6hzj8m/Sites_modifed2.csv?dl=1"
+#site_data=pd.read_csv(url)
+site_data=pd.read_csv(r'C:\Users\mbcx5jt5\Dropbox (The University of Manchester)\Air quality data in China\Manchester_AURN_latlon.csv')
 
-site_data = site_data.set_index('Site_Number')
+#site_data = site_data.set_index('Site_Number')
 site_data.head()
 
 #What is the max/min lat/lon range you need data for?
 #You could use these or just set a range
 lon_max = site_data['Longitude'].max()
-lon_max = site_data['Longitude'].min()
+lon_min = site_data['Longitude'].min()
 lat_max = site_data['Latitude'].max()
-lat_max = site_data['Latitude'].min()
+lat_min = site_data['Latitude'].min()
 
 
 #Load a grid of the selected area, with one file per month
 for year in range(2016,2021):
     for month in range(1,13):
 
-        filename = "met/" + str(year) + "-" + str(month) +"-" + "China_ERA5_met.nc"
+        filename = "met/" + str(year) + "-" + str(month) +"-" + "Manchester_ERA5_met.nc"
         c.retrieve("reanalysis-era5-single-levels",
                    {
                        'variable': ['2m_temperature','mean_sea_level_pressure',
@@ -59,14 +59,24 @@ for year in range(2016,2021):
                            ],
                        "format": "netcdf",
                        'area': [
-                           15.,75.,60.,135.]   #Lat1 Lon1 Lat2 Lon2, a tiny area
+                           65.,-6.,49.,3.]   #Lat1 Lon1 Lat2 Lon2, a tiny area
                        }, filename)
 
+#The area works as [N,W,S,E]
 
 
 
-
-
+# c.retrieve("reanalysis-era5-single-levels",
+#                    {
+#                        'variable': ['2m_temperature'],
+#                        "product_type": "reanalysis",
+#                        'month': 1,
+#                        'year': 2016,
+#                        'day': 5,
+#                        'time': ['12:00'],
+#                        "format": "netcdf",
+#                        'area': [20,15,15,20]
+#                        }, "test.nc")
 
 
 

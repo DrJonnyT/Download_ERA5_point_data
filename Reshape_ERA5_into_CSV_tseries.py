@@ -12,11 +12,13 @@ import pandas as pd
 import pdb
 
 #Load in CSV of sites
-url=r"https://www.dropbox.com/s/f2yvbhlld6hzj8m/Sites_modifed2.csv?dl=1"
-site_data=pd.read_csv(url)
-#site_data=pd.read_csv('Sites_modifed2.csv')
+# url=r"https://www.dropbox.com/s/f2yvbhlld6hzj8m/Sites_modifed2.csv?dl=1"
+# site_data=pd.read_csv(url)
+# #site_data=pd.read_csv('Sites_modifed2.csv')
 
-site_data = site_data.set_index('Site_Number')
+# site_data = site_data.set_index('Site_Number')
+
+site_data=pd.read_csv(r'C:\Users\mbcx5jt5\Dropbox (The University of Manchester)\Air quality data in China\Manchester_AURN_latlon.csv')
 
 
 ###############################################################################
@@ -26,14 +28,15 @@ for index, row in site_data.iterrows():
     lat = row['Latitude']
     lon = row['Longitude']
     #Make an array with the data in
-
+    print(lat)
+    print(lon)
     data_thissite = []
     #Loop through all the met files
-    for filepath in glob.iglob(r'C:\Work\Python\Github\Download_ERA5_point_data\met\*.nc'):
+    for filepath in glob.iglob(r'C:\Work\Python\Github\Download_ERA5_point_data\met\Manchester\*.nc'):
         try:
             #pdb.set_trace()
             ds = xr.open_dataset(filepath)
-            df_thisfile_thissite =  ds.sel(longitude=lon,latitude=lat,method="nearest").to_dataframe().drop(['latitude','longitude'],axis=1)
+            df_thisfile_thissite =  ds.sel(longitude=lon,latitude=lat,method="nearest",tolerance=0.5).to_dataframe().drop(['latitude','longitude'],axis=1)
             data_thissite.append(df_thisfile_thissite)        
  
         ##At the end you want one met file for each site, with all the variables
@@ -42,7 +45,7 @@ for index, row in site_data.iterrows():
             print('Failed to load ' + filepath)
         
     #I think you need to have the directory /met_sites/ already created    
-    export_filename = "met_sites/" + index + ".csv"
+    export_filename = "met_sites/Manchester/" + str(index) + ".csv"
     pd.concat(data_thissite,axis=0).to_csv(export_filename)
         
 
